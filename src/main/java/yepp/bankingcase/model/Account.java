@@ -1,71 +1,50 @@
 package yepp.bankingcase.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
     private int id;
-    @ManyToOne()
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "owner")
+    private int customer;
     @Column(name = "account_iban", nullable = false)
-    private String IBAN;
-    @Column(name = "account_balance", nullable = false)
+    private String iban;
+    @Column(name = "account_balance")
     private double balance;
-    @OneToMany(mappedBy = "receiver_id")
-    private List<Transaction> debitTransactionList;
-    @OneToMany(mappedBy = "sender_id")
-    private List<Transaction> creditTransactionList;
 
-    public Account(int id, User user, String IBAN) {
+    @OneToMany
+    @JoinTable(name = "account_transaction")
+    @JsonIgnoreProperties
+    private List<Transaction> transactionList;
+
+    public Account(int id, int customer, String iban) {
         this.id = id;
-        this.user = user;
-        this.IBAN = IBAN;
-        this.balance = 0;
-        this.debitTransactionList = new ArrayList<>();
-        this.creditTransactionList = new ArrayList<>();
+        this.customer = customer;
+        this.iban = iban;
+        this.balance = 100;
+        this.transactionList = new ArrayList<>();
     }
 
-    public Account() {
-
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public String getIBAN() {
-        return IBAN;
-    }
-
-    public double getBalance() {
-        return balance;
-    }
-
-    public List<Transaction> getTransactionList() {
-        return Stream.concat(debitTransactionList.stream(), creditTransactionList.stream()).toList();
-    }
-
-    public void addDebitTransaction(Transaction transaction) {
-        this.debitTransactionList.add(transaction);
-    }
-    public void addCreditTransaction(Transaction transaction) {
-        this.creditTransactionList.add(transaction);
+    public void addTransaction(Transaction transaction) {
+        this.transactionList.add(transaction);
+        System.out.println("added transaction " + transaction.getId() + " to account " + this.getId());
     }
 
     public void removeTransaction(int transactionId) {
-        this.debitTransactionList.removeIf(transaction -> transaction.getId() == transactionId);
-        this.creditTransactionList.removeIf(transaction -> transaction.getId() == transactionId);
+        this.transactionList.removeIf(transaction -> transaction.getId() == transactionId);
+        System.out.println("removed transaction " + transactionId + " from account " + this.getId());
     }
 }

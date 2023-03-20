@@ -3,7 +3,11 @@ package yepp.bankingcase.service;
 import yepp.bankingcase.model.Transaction;
 
 public interface TransactionService {
-    boolean verifyTransaction(Transaction transaction);
+    Transaction getTransactionById(int id);
 
-    void addTransaction(Transaction transaction);
+    Transaction createTransaction(Transaction transaction);
+
+    Transaction updateTransaction(int id, Transaction transaction);
+
+    void deleteTransaction(int id);
 }
