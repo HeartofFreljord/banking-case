@@ -1,11 +1,13 @@
 package yepp.bankingcase.service;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import yepp.bankingcase.model.Account;
 import yepp.bankingcase.model.Customer;
 import yepp.bankingcase.repository.AccountRepository;
 
-@Component
+import java.util.List;
+
+@Service
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
@@ -39,14 +41,25 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public List<Account> getAccountsByCustomer(Customer customer) {
+        List<Account> accounts = accountRepository.findAccountsByCustomer(customer);
+        if (accounts != null) {
+            for (Account account : accounts) {
+                System.out.println("found account " + account.getId() + " with customer id " + customer.getId());
+            }
+        } else {
+            System.out.println("cannot find account with customer id " + customer.getId());
+        }
+        return accounts;
+    }
+
+    @Override
     public Account createAccount(Account account) {
-        int customerId = account.getCustomer();
+        int customerId = account.getCustomer().getId();
         Customer customer = this.customerService.getCustomerById(customerId);
         if (customer != null) {
             this.accountRepository.save(account);
             System.out.println("saved new account with id " + account.getId());
-            customer.addAccount(account);
-            customerService.updateCustomer(customerId, customer);
             return account;
         }
         return null;
@@ -67,17 +80,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void deleteAccount(int id) {
         if (accountRepository.findById((long) id).isPresent()) {
-            Account account = accountRepository.findById((long) id).get();
-            int customerId = account.getCustomer();
-            Customer customer = customerService.getCustomerById(customerId);
-            if (customer != null) {
-                customer.removeAccount(id);
-                customerService.updateCustomer(customerId, customer);
-                accountRepository.deleteById((long) id);
-                System.out.println("deleted account with id " + id);
-            } else {
-                System.out.println("cannot find customer of account with id " + id);
-            }
+            accountRepository.deleteById((long) id);
+            System.out.println("deleted account with id " + id);
         } else {
             System.out.println("cannot find account with id " + id);
         }

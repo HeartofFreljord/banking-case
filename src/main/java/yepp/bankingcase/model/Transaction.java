@@ -1,10 +1,11 @@
 package yepp.bankingcase.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Date;
 
 @Entity
 @Getter
@@ -13,27 +14,27 @@ import lombok.Setter;
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "transaction_id")
+    @Column()
     private int id;
-    @Column(name = "sender_iban")
+    @Column()
     private String senderIban;
-    @Column(name = "description")
+    @Column()
     private String description;
-    @Column(name = "amount")
+    @Column()
     private double amount;
 
-    @Column(name = "account")
-    private int account;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Account account;
 
-//    @Column(name = "date_time")
-//    private Date date;
+    @Column()
+    private Date sendDate;
 
-    public Transaction(int id, int account, String description, double amount, String senderIban) {
-        this.id = id;
+    public Transaction(Account account, String description, double amount, String senderIban, Date sendDate) {
         this.account = account;
         this.description = description;
         this.amount = amount;
         this.senderIban = senderIban;
-//        this.date = date;
+        this.sendDate = sendDate;
     }
 }

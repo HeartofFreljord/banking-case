@@ -1,12 +1,12 @@
 package yepp.bankingcase.service;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import yepp.bankingcase.model.Customer;
 import yepp.bankingcase.repository.CustomerRepository;
 
 import java.util.List;
 
-@Component
+@Service
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;

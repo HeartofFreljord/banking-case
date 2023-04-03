@@ -1,12 +1,13 @@
 package yepp.bankingcase.service;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import yepp.bankingcase.model.Account;
-import yepp.bankingcase.model.Customer;
 import yepp.bankingcase.model.Transaction;
 import yepp.bankingcase.repository.TransactionRepository;
 
-@Component
+import java.util.List;
+
+@Service
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountService accountService;
@@ -27,15 +28,25 @@ public class TransactionServiceImpl implements TransactionService {
         return transaction;
     }
 
+    public List<Transaction> getTransactionsByAccount(Account account) {
+        List<Transaction> transactions = transactionRepository.findTransactionByAccount(account);
+        if (transactions != null) {
+            for (Transaction transaction : transactions) {
+                System.out.println("found transaction " + transaction.getId() + " with account id " + account.getId());
+            }
+        } else {
+            System.out.println("cannot find transaction with account id " + account.getId());
+        }
+        return transactions;
+    }
+
     @Override
     public Transaction createTransaction(Transaction transaction) {
-        int accountId = transaction.getAccount();
+        int accountId = transaction.getAccount().getId();
         Account account = this.accountService.getAccountById(accountId);
         if (account != null) {
             this.transactionRepository.save(transaction);
             System.out.println("saved new transaction with id " + transaction.getId());
-            account.addTransaction(transaction);
-            accountService.updateAccount(accountId, account);
             return transaction;
         }
         return null;
@@ -56,17 +67,8 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void deleteTransaction(int id) {
         if (transactionRepository.findById((long) id).isPresent()) {
-            Transaction transaction = transactionRepository.findById((long) id).get();
-            int accountId = transaction.getAccount();
-            Account account = accountService.getAccountById(accountId);
-            if (account != null) {
-                account.removeTransaction(id);
-                accountService.updateAccount(accountId, account);
-                transactionRepository.deleteById((long) id);
-                System.out.println("deleted transaction with id " + id);
-            } else {
-                System.out.println("cannot find account of transaction with id " + id);
-            }
+            transactionRepository.deleteById((long) id);
+            System.out.println("deleted transaction with id " + id);
         } else {
             System.out.println("cannot find transaction with id " + id);
         }

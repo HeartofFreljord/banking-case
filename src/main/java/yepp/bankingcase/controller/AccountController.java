@@ -17,6 +17,15 @@ public class AccountController {
     }
 
     @PostMapping(value = "/accounts", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    /**
+     * {
+     *     "customer": { "id": 1 },
+     *     "balance": 100.0,
+     *     "transactionList": [],
+     *     "iban": "NL01 INGB 1234 5678 90"
+     * }
+     */
     public Account createAccount(@RequestBody Account newAccount) {
         if (newAccount != null) {
             this.accountService.createAccount(newAccount);
